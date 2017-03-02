@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
+# Set environment variables for dev
+# Change settings for CI
+if [ ! -z "$BUILD_NUMBER" ]; then
+    # We need the full path here because /sbin is not in user Jenkin's $PATH
+    export XDEBUG_HOST=$(/sbin/ifconfig docker0 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1)
+else
+    export XDEBUG_HOST=$(ipconfig getifaddr en1)
+fi
 
-# Mac: Get host address
-export XDEBUG_HOST=$(ipconfig getifaddr en1)
-
-# Linux: Get host address
-# Via: http://stackoverflow.com/questions/13322485/how-to-i-get-the-primary-ip-address-of-the-local-machine-on-linux-and-os-x
-#export XDEBUG_HOST=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | head -n1)
+export CONTAINER_ENV=${CONTAINER_ENV:-local}
 
 # Other env variables
 export APP_ENV=${APP_ENV:-local}
