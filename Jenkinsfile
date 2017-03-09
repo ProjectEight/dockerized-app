@@ -21,6 +21,7 @@ node('master') {
             sh "APP_ENV=testing ./sd-develop test"
         }
 
+        // If our tests pass and we're on the master branch, package the app into a Docker container
         if( env.BRANCH_NAME == 'master' ) {
             stage('package') {
                 sh './docker/build'

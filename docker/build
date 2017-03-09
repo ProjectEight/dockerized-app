@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+#
+# Process:
+#
+# Copy the code into the packaged directory
+# Run production steps required to build the app (e.g Run composer, deploy scripts, etc)
+# Pull down the env-prod file from AWS S3 bucket to set relevant environment variables for the CI server
+# Build new Docker images with the application baked into the images
+# Remove the contents of the packaged directory
+#
+
 # Bail out on first error
 set -e
 
@@ -24,14 +34,17 @@ cd $DIR/app/packaged
 
 # Get the CI .env file
 ## This assumes we're running in Jenkins as user "jenkins"
-/var/lib/jenkins/.venv/bin/aws s3 cp s3://sd-secrets/env-ci .env --region eu-west-2
+/var/lib/jenkins/.venv/bin/aws s3 cp s3://sd-secrets/env-prod .env --region eu-west-2
 
 # Build the Docker image with latest code
 cd $DIR/app
 
 docker build \
-    -t dockerized-app/app:latest \
-    -t dockerized-app/app:$HASH .
+    -t localhost:5000/dockerized-app/app:latest \
+    -t localhost:5000/dockerized-app/app:$HASH .
+
+docker push localhost:5000/dockerized-app/app:latest
+docker push localhost:5000/dockerized-app/app:$HASH
 
 # Clean up packaged directory
 cd $DIR/app/packaged
