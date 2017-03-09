@@ -12,7 +12,7 @@ node('master') {
             sh "./sd-develop composer install"
 
             // Create .env file for testing
-            // sh '/var/lib/jenkins/.venv/bin/aws s3 cp s3://sd-secrets/env-ci .env'
+            // sh '/var/lib/jenkins/.venv/bin/aws s3 cp s3://sd-secrets/env-ci .env --region eu-west-2'
 
             sh './sd-develop art key:generate'
         }
