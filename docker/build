@@ -18,7 +18,7 @@ cd $DIR/../
 git archive --format=tar --worktree-attributes $HASH | tar -xf -  -C $DIR/app/packaged
 
 echo "Source should now be in ./packaged/"
-ls -lah $DIR/app/
+ls -lah $DIR/app/packaged/
 
 # Production Build Steps
 ## (Decision between export-ignore'ing docker/develop command or not)
@@ -32,20 +32,27 @@ pwd
 ## This assumes we're running in Jenkins as user "jenkins"
 /var/lib/jenkins/.venv/bin/aws s3 cp s3://sd-secrets/env-ci .env --region eu-west-2
 
+cat ./env
+
 # Build the Docker image with latest code
 cd $DIR/app
 pwd
-#docker build \
-#    -t dockerized-app/app:latest \
-#    -t dockerized-app/app:$HASH .
+
+echo 'Building docker images'
+
+docker build \
+    -t dockerized-app/app:latest \
+    -t dockerized-app/app:$HASH .
+
+echo 'Cleaning up packaged directory'
 
 # Clean up packaged directory
-#cd $DIR/app/packaged
-#PWD=$(pwd)
-#if [ "$PWD" == "$DIR/app/packaged" ]; then
-#    # The "vendor" directory (any any built assets!) will be owned
-#    # as user "root" on the Linux file system
-#    # So we'll use Docker to delete them with a one-off container
-#    docker run --rm -w /opt -v $(pwd):/opt ubuntu:16.04 bash -c "rm -rf ./* && rm -rf ./.git* && rm .env*"
-#    touch .gitkeep
-#fi
+cd $DIR/app/packaged
+PWD=$(pwd)
+if [ "$PWD" == "$DIR/app/packaged" ]; then
+    # The "vendor" directory (any any built assets!) will be owned
+    # as user "root" on the Linux file system
+    # So we'll use Docker to delete them with a one-off container
+    docker run --rm -w /opt -v $(pwd):/opt ubuntu:16.04 bash -c "rm -rf ./* && rm -rf ./.git* && rm .env*"
+    touch .gitkeep
+fi
