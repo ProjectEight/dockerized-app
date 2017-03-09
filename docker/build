@@ -32,7 +32,7 @@ pwd
 ## This assumes we're running in Jenkins as user "jenkins"
 /var/lib/jenkins/.venv/bin/aws s3 cp s3://sd-secrets/env-ci .env --region eu-west-2
 
-cat ./env
+cat ./.env
 
 # Build the Docker image with latest code
 cd $DIR/app
