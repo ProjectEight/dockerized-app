@@ -22,9 +22,9 @@ cd $DIR/app/packaged
 # ./develop yarn install
 # ./develop gulp --production
 
-# Get the production .env file
+# Get the CI .env file
 ## This assumes we're running in Jenkins as user "jenkins"
-/var/lib/jenkins/.venv/bin/aws s3 cp s3://shippingdocker-secrets/env-prod .env
+/var/lib/jenkins/.venv/bin/aws s3 cp s3://sd-secrets/env-ci .env
 #cp -f $DIR/../.env $DIR/app/packaged/
 
 # Build the Docker image with latest code
