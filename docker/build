@@ -6,8 +6,6 @@ set -e
 # Get the directory of the build script
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "Build script current directory: {$DIR}"
-
 # Get the current git commit sha
 HASH=$(git rev-parse HEAD)
 
@@ -17,13 +15,9 @@ cd $DIR/../
 # to `export-ignore` extraneous files
 git archive --format=tar --worktree-attributes $HASH | tar -xf -  -C $DIR/app/packaged
 
-echo "Source should now be in ./packaged/"
-ls -lah $DIR/app/packaged/
-
 # Production Build Steps
 ## (Decision between export-ignore'ing docker/develop command or not)
 cd $DIR/app/packaged
-pwd
 ./sd-develop composer install --no-dev
 # ./develop yarn install
 # ./develop gulp --production
@@ -32,19 +26,12 @@ pwd
 ## This assumes we're running in Jenkins as user "jenkins"
 /var/lib/jenkins/.venv/bin/aws s3 cp s3://sd-secrets/env-ci .env --region eu-west-2
 
-cat ./.env
-
 # Build the Docker image with latest code
 cd $DIR/app
-pwd
-
-echo 'Building docker images'
 
 docker build \
     -t dockerized-app/app:latest \
     -t dockerized-app/app:$HASH .
-
-echo 'Cleaning up packaged directory'
 
 # Clean up packaged directory
 cd $DIR/app/packaged
