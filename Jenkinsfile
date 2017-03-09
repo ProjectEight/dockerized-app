@@ -28,6 +28,7 @@ node('master') {
         }
     } catch(error) {
         // Maybe some alerting?
+        sh 'echo "Error encountered."'
         throw error
     } finally {
         // Spin down containers no matter what happens

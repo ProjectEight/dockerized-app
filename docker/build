@@ -6,6 +6,8 @@ set -e
 # Get the directory of the build script
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+echo "Build script current directory: {$DIR}"
+
 # Get the current git commit sha
 HASH=$(git rev-parse HEAD)
 
@@ -15,31 +17,35 @@ cd $DIR/../
 # to `export-ignore` extraneous files
 git archive --format=tar --worktree-attributes $HASH | tar -xf -  -C $DIR/app/packaged
 
+echo "Source should now be in ./packaged/"
+ls -lah $DIR/app/
+
 # Production Build Steps
 ## (Decision between export-ignore'ing docker/develop command or not)
 cd $DIR/app/packaged
-./develop composer install --no-dev
+pwd
+./sd-develop composer install --no-dev
 # ./develop yarn install
 # ./develop gulp --production
 
 # Get the CI .env file
 ## This assumes we're running in Jenkins as user "jenkins"
 /var/lib/jenkins/.venv/bin/aws s3 cp s3://sd-secrets/env-ci .env
-#cp -f $DIR/../.env $DIR/app/packaged/
 
 # Build the Docker image with latest code
 cd $DIR/app
-docker build \
-    -t dockerized-app/app:latest \
-    -t dockerized-app/app:$HASH .
+pwd
+#docker build \
+#    -t dockerized-app/app:latest \
+#    -t dockerized-app/app:$HASH .
 
 # Clean up packaged directory
-cd $DIR/app/packaged
-PWD=$(pwd)
-if [ "$PWD" == "$DIR/app/packaged" ]; then
-    # The "vendor" directory (any any built assets!) will be owned
-    # as user "root" on the Linux file system
-    # So we'll use Docker to delete them with a one-off container
-    docker run --rm -w /opt -v $(pwd):/opt ubuntu:16.04 bash -c "rm -rf ./* && rm -rf ./.git* && rm .env*"
-    touch .gitkeep
-fi
+#cd $DIR/app/packaged
+#PWD=$(pwd)
+#if [ "$PWD" == "$DIR/app/packaged" ]; then
+#    # The "vendor" directory (any any built assets!) will be owned
+#    # as user "root" on the Linux file system
+#    # So we'll use Docker to delete them with a one-off container
+#    docker run --rm -w /opt -v $(pwd):/opt ubuntu:16.04 bash -c "rm -rf ./* && rm -rf ./.git* && rm .env*"
+#    touch .gitkeep
+#fi
