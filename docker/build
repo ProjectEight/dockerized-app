@@ -24,8 +24,8 @@ cd $DIR/app/packaged
 
 # Get the production .env file
 ## This assumes we're running in Jenkins as user "jenkins"
-#/var/lib/jenkins/.venv/bin/aws s3 cp s3://shippingdocker-secrets/env-prod .env
-cp -f $DIR/../.env $DIR/app/packaged/
+/var/lib/jenkins/.venv/bin/aws s3 cp s3://shippingdocker-secrets/env-prod .env
+#cp -f $DIR/../.env $DIR/app/packaged/
 
 # Build the Docker image with latest code
 cd $DIR/app
