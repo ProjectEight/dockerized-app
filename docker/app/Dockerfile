@@ -21,8 +21,9 @@ RUN apt-get update \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && echo "daemon off;" >> /etc/nginx/nginx.conf \
-    && ln -sf /dev/stdout /var/log/nginx/access.log \
+    && echo "daemon off;" >> /etc/nginx/nginx.conf
+
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
 COPY default /etc/nginx/sites-available/default
@@ -36,3 +37,6 @@ COPY start-container /usr/local/bin/start-container
 RUN chmod +x usr/local/bin/start-container
 
 CMD ["start-container"]
+
+COPY packaged /var/www/html
+RUN chown -R www-data: /var/www/html

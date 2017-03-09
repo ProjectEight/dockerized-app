@@ -12,29 +12,25 @@ node('master') {
             sh "./sd-develop composer install"
 
             // Create .env file for testing
-            sh 'cp .env.example .env'
+            // sh '/var/lib/jenkins/.venv/bin/aws s3 cp s3://sd-secrets/env-ci .env'
+
             sh './sd-develop art key:generate'
-            sh 'sed -i "s/REDIS_HOST=.*/REDIS_HOST=redis/" .env'
-            sh 'sed -i "s/CACHE_DRIVER=.*/CACHE_DRIVER=redis/" .env'
-            sh 'sed -i "s/SESSION_DRIVER=.*/SESSION_DRIVER=redis/" .env'
         }
 
         stage('test') {
             sh "APP_ENV=testing ./sd-develop test"
         }
 
-        stage('build-on-push') {
-            sh 'echo "Testing that this build was initiated immediately after pushing to repo 1108"'
-            sh "APP_ENV=testing ./sd-develop test"
+        if( env.BRANCH_NAME == 'master' ) {
+            stage('package') {
+                sh './docker/build'
+            }
         }
-
     } catch(error) {
-        // Implement error handling, alerting, etc here
+        // Maybe some alerting?
         throw error
-
     } finally {
         // Spin down containers no matter what happens
         sh './sd-develop down'
-
     }
 }
