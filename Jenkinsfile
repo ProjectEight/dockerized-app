@@ -23,6 +23,11 @@ node('master') {
             sh "APP_ENV=testing ./develop test"
         }
 
+        stage('build-on-push') {
+            sh 'echo "Testing that this build was initiated immediately after pushing to repo"'
+            sh "APP_ENV=testing ./develop test"
+        }
+
     } catch(error) {
         // Implement error handling, alerting, etc here
         throw error
