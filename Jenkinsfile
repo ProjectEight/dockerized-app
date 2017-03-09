@@ -24,7 +24,7 @@ node('master') {
         }
 
         stage('build-on-push') {
-            sh 'echo "Testing that this build was initiated immediately after pushing to repo"'
+            sh 'echo "Testing that this build was initiated immediately after pushing to repo 1108"'
             sh "APP_ENV=testing ./sd-develop test"
         }
 
